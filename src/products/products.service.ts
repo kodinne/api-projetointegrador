@@ -30,10 +30,24 @@ export class ProductsService {
     return { items, total, page, limit: take };
   }
 
+  async findOne(id: number) {
+    const p = await this.repo.findOne({ where: { id } });
+    if (!p) throw new NotFoundException(`Produto com id ${id} não encontrado`);
+    return p;
+  }
+
   async updateStock(id: number, stock: number) {
     const p = await this.repo.findOne({ where: { id } });
     if (!p) throw new NotFoundException('Product not found');
     p.stock = stock;
     return this.repo.save(p);
+  }
+
+  async remove(id: number): Promise<void> {
+    const result = await this.repo.delete(id);
+    if (result.affected === 0) {
+      throw new NotFoundException(`Produto com id ${id} não encontrado`);
+    }
+    // retorna void -> controller responderá com 200 por padrão.
   }
 }
