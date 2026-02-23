@@ -34,6 +34,8 @@ public class AuthService {
 
         String token = jwtService.generateToken(user.getId(), user.getEmail(), user.getName());
         Map<String, Object> payload = Map.of("sub", user.getId(), "email", user.getEmail(), "name", user.getName());
-        return Map.of("access_token", token, "user", payload);
+
+        // Keep both keys for backward compatibility with existing frontend clients.
+        return Map.of("access_token", token, "token", token, "user", payload);
     }
 }

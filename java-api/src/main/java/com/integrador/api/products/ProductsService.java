@@ -1,12 +1,15 @@
 package com.integrador.api.products;
 
+import com.integrador.api.orders.OrderItemRepository;
 import com.integrador.api.products.dto.CreateProductRequest;
+import com.integrador.api.returns.ReturnRecordRepository;
 import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
@@ -15,17 +18,44 @@ import java.util.Map;
 @Service
 public class ProductsService {
     private final ProductRepository productRepository;
+    private final OrderItemRepository orderItemRepository;
+    private final ReturnRecordRepository returnRecordRepository;
 
-    public ProductsService(ProductRepository productRepository) {
+    public ProductsService(
+            ProductRepository productRepository,
+            OrderItemRepository orderItemRepository,
+            ReturnRecordRepository returnRecordRepository
+    ) {
         this.productRepository = productRepository;
+        this.orderItemRepository = orderItemRepository;
+        this.returnRecordRepository = returnRecordRepository;
     }
 
     public Product create(CreateProductRequest request) {
+        String normalizedName = request.name() == null ? "" : request.name().trim();
+        if (normalizedName.isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "name is required");
+        }
+        if (productRepository.existsByNameIgnoreCase(normalizedName)) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Nao e possivel cadastrar: este produto ja existe.");
+        }
+
+        if (request.price() == null || request.price().signum() <= 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "price must be greater than zero");
+        }
+        if (request.stock() == null || request.stock() <= 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "stock must be greater than zero");
+        }
+        if (request.category() == null || request.category().isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "category is required");
+        }
+
         Product product = new Product();
         product.setSku(request.sku());
-        product.setName(request.name());
-        product.setCategory(request.category());
+        product.setName(normalizedName);
+        product.setCategory(request.category().trim());
         product.setPrice(request.price());
+        product.setCostPrice(request.costPrice() == null ? java.math.BigDecimal.ZERO : request.costPrice());
         product.setStock(request.stock());
         product.setStatus("active");
         return productRepository.save(product);
@@ -75,8 +105,19 @@ public class ProductsService {
         return productRepository.save(product);
     }
 
-    public void remove(Long id) {
+    @Transactional
+    public Map<String, Object> remove(Long id) {
         Product product = findOne(id);
+        long removedOrderItems = orderItemRepository.deleteByProduct_Id(id);
+        long removedReturns = returnRecordRepository.deleteByProductId(id);
         productRepository.delete(product);
+        productRepository.flush();
+
+        return Map.of(
+                "removed", true,
+                "message", "Produto removido com sucesso.",
+                "removedOrderItems", removedOrderItems,
+                "removedReturns", removedReturns
+        );
     }
 }

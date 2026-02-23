@@ -1,6 +1,7 @@
 package com.integrador.api.auth;
 
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -23,10 +24,20 @@ public class JwtService {
     public String generateToken(Long userId, String email, String name) {
         Instant now = Instant.now();
         return Jwts.builder()
-                .claims(Map.of("sub", userId, "email", email, "name", name))
+                .subject(String.valueOf(userId))
+                .claims(Map.of("email", email, "name", name))
                 .issuedAt(Date.from(now))
                 .expiration(Date.from(now.plus(1, ChronoUnit.DAYS)))
                 .signWith(key)
                 .compact();
+    }
+
+    public boolean isTokenValid(String token) {
+        try {
+            Jwts.parser().verifyWith(key).build().parseSignedClaims(token);
+            return true;
+        } catch (JwtException | IllegalArgumentException ex) {
+            return false;
+        }
     }
 }

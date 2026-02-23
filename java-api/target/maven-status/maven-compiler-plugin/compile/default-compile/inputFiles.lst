@@ -2,6 +2,7 @@ C:\Users\marques.mateus\Documents\Projeto integrador\api\java-api\src\main\java\
 C:\Users\marques.mateus\Documents\Projeto integrador\api\java-api\src\main\java\com\integrador\api\auth\AuthController.java
 C:\Users\marques.mateus\Documents\Projeto integrador\api\java-api\src\main\java\com\integrador\api\auth\AuthService.java
 C:\Users\marques.mateus\Documents\Projeto integrador\api\java-api\src\main\java\com\integrador\api\auth\JwtService.java
+C:\Users\marques.mateus\Documents\Projeto integrador\api\java-api\src\main\java\com\integrador\api\config\ApiAuthInterceptor.java
 C:\Users\marques.mateus\Documents\Projeto integrador\api\java-api\src\main\java\com\integrador\api\config\CorsConfig.java
 C:\Users\marques.mateus\Documents\Projeto integrador\api\java-api\src\main\java\com\integrador\api\config\DataSeeder.java
 C:\Users\marques.mateus\Documents\Projeto integrador\api\java-api\src\main\java\com\integrador\api\config\GlobalExceptionHandler.java
@@ -20,6 +21,8 @@ C:\Users\marques.mateus\Documents\Projeto integrador\api\java-api\src\main\java\
 C:\Users\marques.mateus\Documents\Projeto integrador\api\java-api\src\main\java\com\integrador\api\products\ProductRepository.java
 C:\Users\marques.mateus\Documents\Projeto integrador\api\java-api\src\main\java\com\integrador\api\products\ProductsController.java
 C:\Users\marques.mateus\Documents\Projeto integrador\api\java-api\src\main\java\com\integrador\api\products\ProductsService.java
+C:\Users\marques.mateus\Documents\Projeto integrador\api\java-api\src\main\java\com\integrador\api\reports\ReportsController.java
+C:\Users\marques.mateus\Documents\Projeto integrador\api\java-api\src\main\java\com\integrador\api\reports\ReportsService.java
 C:\Users\marques.mateus\Documents\Projeto integrador\api\java-api\src\main\java\com\integrador\api\returns\dto\CreateReturnRequest.java
 C:\Users\marques.mateus\Documents\Projeto integrador\api\java-api\src\main\java\com\integrador\api\returns\ReturnRecord.java
 C:\Users\marques.mateus\Documents\Projeto integrador\api\java-api\src\main\java\com\integrador\api\returns\ReturnRecordRepository.java

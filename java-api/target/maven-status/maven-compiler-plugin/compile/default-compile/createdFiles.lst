@@ -2,12 +2,14 @@ com\integrador\api\returns\ReturnsService.class
 com\integrador\api\users\UserRepository.class
 com\integrador\api\auth\JwtService.class
 com\integrador\api\returns\ReturnRecordRepository.class
+com\integrador\api\reports\ReportsService.class
 com\integrador\api\users\User.class
 com\integrador\api\auth\AuthController$LoginRequest.class
 com\integrador\api\products\dto\CreateProductRequest.class
 com\integrador\api\orders\OrdersController.class
 com\integrador\api\products\ProductsService.class
 com\integrador\api\users\UsersController.class
+com\integrador\api\reports\ReportsController.class
 com\integrador\api\orders\OrderItem.class
 com\integrador\api\orders\dto\CreateOrderRequest.class
 com\integrador\api\auth\AuthController.class
@@ -17,6 +19,7 @@ com\integrador\api\orders\OrderItemRepository.class
 com\integrador\api\products\ProductRepository.class
 com\integrador\api\orders\Order.class
 com\integrador\api\returns\dto\CreateReturnRequest.class
+com\integrador\api\config\ApiAuthInterceptor.class
 com\integrador\api\config\DataSeeder.class
 com\integrador\api\orders\OrderRepository.class
 com\integrador\api\dashboard\DashboardController.class
