@@ -19,6 +19,9 @@ public class Order {
     @JoinColumn(name = "customer_id")
     private User customer;
 
+    @Column
+    private String customerName;
+
     @Column(nullable = false)
     private String salesChannel = "sales";
 
@@ -39,6 +42,8 @@ public class Order {
     public void setId(Long id) { this.id = id; }
     public User getCustomer() { return customer; }
     public void setCustomer(User customer) { this.customer = customer; }
+    public String getCustomerName() { return customerName; }
+    public void setCustomerName(String customerName) { this.customerName = customerName; }
     public String getSalesChannel() { return salesChannel; }
     public void setSalesChannel(String salesChannel) { this.salesChannel = salesChannel; }
     public String getDestination() { return destination; }

@@ -3,6 +3,7 @@ package com.integrador.api.orders;
 import com.integrador.api.orders.dto.CreateOrderRequest;
 import com.integrador.api.products.Product;
 import com.integrador.api.products.ProductRepository;
+import com.integrador.api.returns.ReturnRecordRepository;
 import com.integrador.api.users.User;
 import com.integrador.api.users.UserRepository;
 import jakarta.persistence.criteria.JoinType;
@@ -26,19 +27,32 @@ public class OrdersService {
     private final OrderRepository orderRepository;
     private final UserRepository userRepository;
     private final ProductRepository productRepository;
+    private final ReturnRecordRepository returnRecordRepository;
 
-    public OrdersService(OrderRepository orderRepository, UserRepository userRepository, ProductRepository productRepository) {
+    public OrdersService(
+            OrderRepository orderRepository,
+            UserRepository userRepository,
+            ProductRepository productRepository,
+            ReturnRecordRepository returnRecordRepository
+    ) {
         this.orderRepository = orderRepository;
         this.userRepository = userRepository;
         this.productRepository = productRepository;
+        this.returnRecordRepository = returnRecordRepository;
     }
 
     @Transactional
     public Order create(CreateOrderRequest request) {
         User customer = resolveCustomer(request.customerId());
+        String customCustomerName = request.customerName() == null ? "" : request.customerName().trim();
 
         Order order = new Order();
         order.setCustomer(customer);
+        order.setCustomerName(
+                !customCustomerName.isBlank()
+                        ? customCustomerName
+                        : (customer != null ? customer.getName() : "Cliente")
+        );
         order.setSalesChannel(request.salesChannel() == null ? "sales" : request.salesChannel());
         order.setDestination(request.destination() == null ? "warehouse" : request.destination());
         order.setStatus("completed");
@@ -150,7 +164,12 @@ public class OrdersService {
         Map<String, Object> out = new HashMap<>();
         out.put("id", order.getId());
         out.put("customerId", order.getCustomer() != null ? order.getCustomer().getId() : null);
-        out.put("customerName", order.getCustomer() != null ? order.getCustomer().getName() : "Cliente");
+        out.put(
+                "customerName",
+                (order.getCustomerName() != null && !order.getCustomerName().isBlank())
+                        ? order.getCustomerName()
+                        : (order.getCustomer() != null ? order.getCustomer().getName() : "Cliente")
+        );
         out.put("createdAt", order.getCreatedAt());
         out.put("date", order.getCreatedAt());
         out.put("salesChannel", order.getSalesChannel());
@@ -159,5 +178,39 @@ public class OrdersService {
         out.put("total", total);
         out.put("items", items);
         return out;
+    }
+
+    @Transactional
+    public Map<String, Object> deleteAllSales() {
+        List<Order> allOrders = orderRepository.findAll();
+        if (allOrders.isEmpty()) {
+            return Map.of(
+                    "message", "Nenhuma venda para apagar",
+                    "deletedOrders", 0
+            );
+        }
+
+        for (Order order : allOrders) {
+            for (OrderItem item : order.getItems()) {
+                Product product = item.getProduct();
+                if (product != null) {
+                    int quantity = item.getQuantity() == null ? 0 : item.getQuantity();
+                    int currentStock = product.getStock() == null ? 0 : product.getStock();
+                    product.setStock(currentStock + quantity);
+                    productRepository.save(product);
+                }
+            }
+        }
+
+        long deletedCount = allOrders.size();
+        long deletedReturns = returnRecordRepository.count();
+        returnRecordRepository.deleteAll();
+        orderRepository.deleteAll(allOrders);
+
+        return Map.of(
+                "message", "Vendas e devolucoes apagadas com sucesso",
+                "deletedOrders", deletedCount,
+                "deletedReturns", deletedReturns
+        );
     }
 }

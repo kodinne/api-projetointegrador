@@ -45,8 +45,7 @@ public class DashboardController {
                 .filter(r -> inPeriod(r.getDate(), period))
                 .map(r -> r.getValue() == null ? BigDecimal.ZERO : r.getValue())
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
-        BigDecimal purchase = BigDecimal.ZERO;
-        BigDecimal income = revenue.subtract(purchase);
+        BigDecimal income = revenue.subtract(salesReturn);
 
         Map<String, Integer> topSelling = new HashMap<>();
         for (Order order : orders) {
@@ -71,7 +70,7 @@ public class DashboardController {
         List<Product> stockAlert = productRepository.findAll().stream().filter(p -> p.getStock() <= 5).toList();
 
         return ResponseEntity.ok(Map.of(
-                "cards", Map.of("revenue", revenue, "salesReturn", salesReturn, "purchase", purchase, "income", income),
+                "cards", Map.of("revenue", revenue, "salesReturn", salesReturn, "income", income),
                 "topSelling", topSellingArray,
                 "stockAlert", stockAlert
         ));

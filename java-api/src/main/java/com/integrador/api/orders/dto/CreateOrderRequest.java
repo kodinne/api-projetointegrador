@@ -8,6 +8,7 @@ import java.util.List;
 
 public record CreateOrderRequest(
         @JsonAlias({"customerId", "userId"}) Long customerId,
+        String customerName,
         String salesChannel,
         String destination,
         @NotEmpty List<@Valid OrderItemRequest> items

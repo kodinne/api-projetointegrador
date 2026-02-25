@@ -5,6 +5,8 @@ import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
 @RequestMapping("/orders")
 public class OrdersController {
@@ -27,5 +29,11 @@ public class OrdersController {
             @RequestParam(required = false) String q
     ) {
         return ResponseEntity.ok(ordersService.findAll(page, limit, status, q));
+    }
+
+    @DeleteMapping
+    public ResponseEntity<?> deleteAllSales() {
+        Map<String, Object> result = ordersService.deleteAllSales();
+        return ResponseEntity.ok(result);
     }
 }

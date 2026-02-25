@@ -32,7 +32,14 @@ public class ProductsService {
     }
 
     public Product create(CreateProductRequest request) {
+        String normalizedSku = request.sku() == null ? "" : request.sku().trim();
         String normalizedName = request.name() == null ? "" : request.name().trim();
+        if (normalizedSku.isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "sku is required");
+        }
+        if (productRepository.existsBySkuIgnoreCase(normalizedSku)) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Nao e possivel cadastrar: SKU ja existe.");
+        }
         if (normalizedName.isBlank()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "name is required");
         }
@@ -51,7 +58,7 @@ public class ProductsService {
         }
 
         Product product = new Product();
-        product.setSku(request.sku());
+        product.setSku(normalizedSku);
         product.setName(normalizedName);
         product.setCategory(request.category().trim());
         product.setPrice(request.price());
@@ -100,6 +107,9 @@ public class ProductsService {
     }
 
     public Product updateStock(Long id, Integer stock) {
+        if (stock == null || stock < 0) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "stock must be zero or greater");
+        }
         Product product = findOne(id);
         product.setStock(stock);
         return productRepository.save(product);
